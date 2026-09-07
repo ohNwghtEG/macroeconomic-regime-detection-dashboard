@@ -1,0 +1,16 @@
+{
+  "nber_report": {
+    "true_positive": 77,
+    "false_positive": 159,
+    "false_negative": 8,
+    "true_negative": 532,
+    "precision": 0.326,
+    "recall": 0.906,
+    "f1": 0.48,
+    "accuracy": 0.785,
+    "months_evaluated": 776,
+    "recession_months_in_sample": 85
+  },
+  "filtered_vs_smoothed_disagreement": 0.05439330543933055,
+  "generated_utc": "2026-09-06T18:37:09.087350+00:00"
+}

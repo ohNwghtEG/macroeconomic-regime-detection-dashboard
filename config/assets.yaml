@@ -1,0 +1,112 @@
+# ---------------------------------------------------------------------------
+# Asset universe.
+#
+# WHY THE SPLICING MATTERS
+# SPY starts 1993, TLT 2002, GLD 2004, DBC 2006. The four-asset panel therefore
+# spans ~19 years containing TWO recessions (2008, 2020). You cannot estimate
+# four regimes x four assets from two recessions.
+#
+# Each asset splices a long-history total-return proxy behind the ETF, taking the
+# sample from 2 recessions to ~8. The ETF is used once it exists.
+#
+# TOTAL RETURN, NOT PRICE: dividends are ~2%/yr for SPY and far more of the total
+# for TLT. A price-only backtest can invert the conclusion outright.
+# ---------------------------------------------------------------------------
+
+assets:
+  - key: equity
+    name: US Equities
+    etf: SPY
+    etf_start: "1993-02-01"
+    proxy:
+      kind: fred_total_return
+      note: >
+        Pre-1993: S&P 500 total return. Built from FRED SP500 price plus a
+        dividend-yield assumption, or Shiller data if available offline.
+    role: growth_asset
+
+  - key: bonds
+    name: Long US Treasuries
+    etf: TLT
+    etf_start: "2002-08-01"
+    proxy:
+      kind: bond_total_return_from_yield
+      yield_series: GS10
+      duration: 8.5
+      note: >
+        Pre-2002: 10Y Treasury total return reconstructed from GS10 yields using
+        a duration approximation:
+          r_t ~= y_{t-1}/12 - D * (y_t - y_{t-1})
+        i.e. carry plus duration-driven price change. Approximate but far better
+        than discarding 50 years of history.
+    role: deflation_hedge
+
+  - key: gold
+    name: Gold
+    etf: GLD
+    etf_start: "2004-11-01"
+    proxy:
+      kind: fred_price
+      series: null
+      note: >
+        Pre-2004: gold spot. NOTE - the long-history LBMA series on FRED
+        (GOLDPMGBD228NLBM) was discontinued over licensing. Resolved at build
+        time; falls back to yfinance GC=F / ^XAU or a bundled CSV.
+    role: inflation_hedge
+
+  - key: commodities
+    name: Broad Commodities
+    etf: DBC
+    etf_start: "2006-02-01"
+    proxy:
+      kind: fred_price
+      series: PPIACO
+      note: >
+        Pre-2006: PPI All Commodities as a rough commodity-basket proxy. This is
+        the weakest splice in the set (PPI is an index, not an investable return)
+        and is flagged as such in the report.
+    role: inflation_hedge
+
+  - key: cash
+    name: Cash / T-Bills
+    etf: BIL
+    etf_start: "2007-05-01"
+    proxy:
+      kind: fred_yield_accrual
+      series: DTB3
+      note: "Pre-2007: 3-month T-bill yield accrued monthly."
+    role: safe_asset
+
+# ---------------------------------------------------------------------------
+# Benchmarks. The 60/40 is REBALANCED and carries the same cost model as the
+# strategy - comparing against buy-and-hold 60/40 is a rigged fight.
+# ---------------------------------------------------------------------------
+benchmarks:
+  - key: sixty_forty
+    name: 60/40 (rebalanced quarterly)
+    weights: {equity: 0.60, bonds: 0.40}
+    rebalance: quarterly
+
+  - key: equal_weight
+    name: Equal weight all assets
+    weights: equal
+    rebalance: quarterly
+
+  - key: momentum
+    name: 12-month price momentum (no macro data)
+    kind: signal
+    note: >
+      THE CRITICAL BENCHMARK. Markets price the regime before the data confirms
+      it. The real question is not "does this beat 60/40" but "does macro data
+      add anything over a signal using only prices?" If the macro model loses to
+      this, that is a genuine finding and gets reported honestly.
+
+# ---------------------------------------------------------------------------
+backtest:
+  start_date: "1972-01-01"
+  signal_to_trade_lag_months: 1     # signal at month-end T -> trade at T+1
+  transaction_cost_bps: 10          # round-trip, applied to turnover
+  allocation_method: probability_weighted   # w = sum_k p_k * w_k, not hard switch
+  max_weight: 0.70
+  min_weight: 0.00
+  long_only: true

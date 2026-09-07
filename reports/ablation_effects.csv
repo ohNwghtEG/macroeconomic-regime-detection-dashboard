@@ -1,0 +1,8 @@
+effect,sharpe_impact
+A x C,0.05
+B: smoothed decoding,0.0435
+A: ignore publication lag,-0.0375
+C: full-sample fit,0.0225
+A x B,0.009
+A x B x C,-0.0075
+B x C,-0.005

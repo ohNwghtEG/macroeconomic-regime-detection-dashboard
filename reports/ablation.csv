@@ -1,0 +1,9 @@
+cell,A_ignore_lag,B_smoothed,C_full_sample,n_biases,sharpe,ann_return_%,ann_vol_%,max_drawdown_%,months,start,sharpe_inflation
+none (honest),False,False,False,0,1.02,10.08,9.93,-23.3,535,1982-01-31,0.0
+C,False,False,True,1,0.99,9.2,9.37,-29.6,535,1982-01-31,-0.03
+B,False,True,False,1,1.052,10.39,9.9,-22.6,535,1982-01-31,0.032
+A,True,False,False,1,0.916,8.98,9.97,-26.93,535,1982-01-31,-0.104
+BC,False,True,True,2,1.027,9.54,9.34,-29.07,535,1982-01-31,0.007
+AC,True,False,True,2,1.001,9.29,9.35,-29.07,535,1982-01-31,-0.019
+AB,True,True,False,2,0.981,9.6,9.89,-28.46,535,1982-01-31,-0.039
+ABC,True,True,True,3,1.041,9.68,9.33,-29.07,535,1982-01-31,0.021

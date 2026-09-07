@@ -1,0 +1,138 @@
+{
+  "assets": {
+    "equity_french_market": {
+      "fetched_utc": "2026-09-06T00:31:26+00:00",
+      "rows": 1201
+    },
+    "etf_BIL": {
+      "fetched_utc": "2026-09-06T00:31:28+00:00",
+      "rows": 233
+    },
+    "etf_DBC": {
+      "fetched_utc": "2026-09-06T00:31:28+00:00",
+      "rows": 248
+    },
+    "etf_GLD": {
+      "fetched_utc": "2026-09-06T00:31:27+00:00",
+      "rows": 263
+    },
+    "etf_SPY": {
+      "fetched_utc": "2026-09-06T00:31:27+00:00",
+      "rows": 405
+    },
+    "etf_TLT": {
+      "fetched_utc": "2026-09-06T00:31:27+00:00",
+      "rows": 291
+    },
+    "gold_futures": {
+      "fetched_utc": "2026-09-06T00:31:27+00:00",
+      "rows": 267
+    }
+  },
+  "fred": {
+    "AAA": {
+      "fetched_utc": "2026-09-06T00:21:11+00:00",
+      "rows": 1292
+    },
+    "ANFCI": {
+      "fetched_utc": "2026-09-06T00:21:09+00:00",
+      "rows": 2904
+    },
+    "BAA": {
+      "fetched_utc": "2026-09-06T00:21:11+00:00",
+      "rows": 1292
+    },
+    "BAA10Y": {
+      "fetched_utc": "2026-09-06T00:21:10+00:00",
+      "rows": 10169
+    },
+    "BAMLH0A0HYM2": {
+      "fetched_utc": "2026-09-06T00:18:35+00:00",
+      "rows": 787
+    },
+    "CFNAI": {
+      "fetched_utc": "2026-09-06T00:21:04+00:00",
+      "rows": 713
+    },
+    "CPIAUCSL": {
+      "fetched_utc": "2026-09-06T00:21:07+00:00",
+      "rows": 954
+    },
+    "CPILFESL": {
+      "fetched_utc": "2026-09-06T00:21:08+00:00",
+      "rows": 834
+    },
+    "DTB3": {
+      "fetched_utc": "2026-09-06T00:21:20+00:00",
+      "rows": 18160
+    },
+    "FEDFUNDS": {
+      "fetched_utc": "2026-09-06T00:21:17+00:00",
+      "rows": 866
+    },
+    "GS10": {
+      "fetched_utc": "2026-09-06T00:21:18+00:00",
+      "rows": 881
+    },
+    "ICSA": {
+      "fetched_utc": "2026-09-06T00:21:06+00:00",
+      "rows": 3113
+    },
+    "INDPRO": {
+      "fetched_utc": "2026-09-06T00:21:05+00:00",
+      "rows": 1291
+    },
+    "M2SL": {
+      "fetched_utc": "2026-09-06T00:21:18+00:00",
+      "rows": 811
+    },
+    "NFCI": {
+      "fetched_utc": "2026-09-06T00:21:09+00:00",
+      "rows": 2904
+    },
+    "PAYEMS": {
+      "fetched_utc": "2026-09-06T00:21:06+00:00",
+      "rows": 1052
+    },
+    "PERMIT": {
+      "fetched_utc": "2026-09-06T00:21:06+00:00",
+      "rows": 799
+    },
+    "PPIACO": {
+      "fetched_utc": "2026-09-06T00:21:08+00:00",
+      "rows": 1363
+    },
+    "SAHMREALTIME": {
+      "fetched_utc": "2026-09-06T00:21:21+00:00",
+      "rows": 800
+    },
+    "T10Y2Y": {
+      "fetched_utc": "2026-09-06T00:21:13+00:00",
+      "rows": 12563
+    },
+    "T10Y3M": {
+      "fetched_utc": "2026-09-06T00:21:14+00:00",
+      "rows": 11172
+    },
+    "T10YFF": {
+      "fetched_utc": "2026-09-06T00:21:16+00:00",
+      "rows": 16152
+    },
+    "UMCSENT": {
+      "fetched_utc": "2026-09-06T00:21:07+00:00",
+      "rows": 675
+    },
+    "UNRATE": {
+      "fetched_utc": "2026-09-06T00:21:05+00:00",
+      "rows": 943
+    },
+    "USREC": {
+      "fetched_utc": "2026-09-06T00:21:20+00:00",
+      "rows": 2061
+    },
+    "VIXCLS": {
+      "fetched_utc": "2026-09-06T00:21:17+00:00",
+      "rows": 9266
+    }
+  }
+}

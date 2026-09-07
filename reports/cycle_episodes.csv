@@ -1,0 +1,5 @@
+state,episodes,total_months,mean_months,median_months,max_months
+recession,30,236,7.9,5.0,27
+slowdown,23,176,7.7,6.0,15
+expansion,24,152,6.3,4.0,21
+recovery,26,150,5.8,4.0,14

@@ -1,0 +1,6 @@
+,sharpe_strategy,sharpe_benchmark,sharpe_difference,ci_lower_95,ci_upper_95,p_value,significant_at_5pct,n_months,n_bootstrap,correlation,rf_subtracted
+rule_cycle,0.652,0.682,-0.031,-0.197,0.131,0.7072,False,535,5000,0.8885,True
+rule_quadrant,0.546,0.682,-0.136,-0.377,0.11,0.298,False,535,5000,0.8036,True
+hmm_walkforward,0.655,0.682,-0.027,-0.15,0.097,0.636,False,535,5000,0.9524,True
+equal_weight,0.529,0.682,-0.153,-0.346,0.04,0.1212,False,535,5000,0.8662,True
+momentum_no_macro,0.679,0.682,-0.003,-0.256,0.233,0.9988,False,535,5000,0.7581,True

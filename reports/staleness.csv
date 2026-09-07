@@ -1,0 +1,26 @@
+,series,name,dimension,frequency,transform,lag_days,first_obs,last_obs,n_obs,newest_available_period,staleness_days
+0,AAA,Moody's Seasoned Aaa Corporate Bond Yield,financial,monthly,level,5,1919-01-01,2026-08-01,1292,2026-08-31,6
+1,ANFCI,Adjusted National Financial Conditions Index,financial,weekly,level,5,1971-01-08,2026-08-28,2904,2026-08-28,9
+2,BAA,Moody's Seasoned Baa Corporate Bond Yield,financial,monthly,level,5,1919-01-01,2026-08-01,1292,2026-08-31,6
+3,BAA10Y,Moody's Baa Corporate Yield minus 10Y Treasury,financial,daily,level,1,1986-01-02,2026-09-03,10169,2026-09-03,3
+4,NFCI,Chicago Fed National Financial Conditions Index,financial,weekly,level,5,1971-01-08,2026-08-28,2904,2026-08-28,9
+5,T10Y2Y,10Y minus 2Y Treasury Spread,financial,daily,level,1,1976-06-01,2026-09-04,12563,2026-09-04,2
+6,T10Y3M,10Y minus 3M Treasury Spread,financial,daily,level,1,1982-01-04,2026-09-04,11172,2026-09-04,2
+7,T10YFF,10Y Treasury minus Fed Funds Rate,financial,daily,level,1,1962-01-02,2026-09-03,16152,2026-09-03,3
+8,VIXCLS,CBOE Volatility Index,financial,daily,level,1,1990-01-02,2026-09-03,9266,2026-09-03,3
+9,CFNAI,Chicago Fed National Activity Index,growth,monthly,level,27,1967-03-01,2026-07-01,713,2026-07-31,37
+10,ICSA,Initial Jobless Claims,growth,weekly,pct13w,5,1967-01-07,2026-08-29,3113,2026-08-29,8
+11,INDPRO,Industrial Production Index,growth,monthly,yoy,17,1919-01-01,2026-07-01,1291,2026-07-31,37
+12,PAYEMS,Total Nonfarm Payrolls,growth,monthly,yoy,8,1939-01-01,2026-08-01,1052,2026-07-31,37
+13,PERMIT,New Private Housing Building Permits,growth,monthly,yoy,19,1960-01-01,2026-07-01,799,2026-07-31,37
+14,UMCSENT,University of Michigan Consumer Sentiment,growth,monthly,diff12,2,1952-11-01,2026-07-01,675,2026-07-31,37
+15,UNRATE,Unemployment Rate,growth,monthly,diff3,8,1948-01-01,2026-08-01,943,2026-07-31,37
+16,CPIAUCSL,CPI All Urban Consumers (SA),inflation,monthly,yoy,16,1947-01-01,2026-07-01,954,2026-07-31,37
+17,CPILFESL,"Core CPI (ex food & energy, SA)",inflation,monthly,yoy,16,1957-01-01,2026-07-01,834,2026-07-31,37
+18,PPIACO,Producer Price Index (All Commodities),inflation,monthly,yoy,17,1913-01-01,2026-07-01,1363,2026-07-31,37
+19,DTB3,3-Month Treasury Bill Rate,policy,daily,level,1,1954-01-04,2026-09-03,18160,2026-09-03,3
+20,FEDFUNDS,Effective Federal Funds Rate,policy,monthly,diff12,2,1954-07-01,2026-08-01,866,2026-08-31,6
+21,GS10,10-Year Treasury Constant Maturity Rate,policy,monthly,level,2,1953-04-01,2026-08-01,881,2026-08-31,6
+22,M2SL,M2 Money Stock,policy,monthly,yoy,27,1959-01-01,2026-07-01,811,2026-07-31,37
+23,SAHMREALTIME,Real-time Sahm Rule Recession Indicator,validation,monthly,level,8,1959-12-01,2026-08-01,800,2026-07-31,37
+24,USREC,NBER Recession Indicator,validation,monthly,level,365,1854-12-01,2026-08-01,2061,2025-08-31,371

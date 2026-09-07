@@ -1,0 +1,25 @@
+# Secrets - MUST stay untracked
+.env
+*.key
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+build/
+dist/
+
+# Data caches (parquet caches are committed selectively - see data/cache/.gitignore)
+data/raw/
+*.log
+
+# Generated reports (the built HTML report IS committed; intermediates are not)
+reports/_intermediate/
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+tests/.collected_count

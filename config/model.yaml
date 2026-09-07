@@ -1,0 +1,156 @@
+# ---------------------------------------------------------------------------
+# Regime model configuration.
+# ---------------------------------------------------------------------------
+
+standardization:
+  method: expanding            # expanding-window z-score, NEVER full-sample.
+  min_periods: 60              # need 5y of history before emitting a z-score
+  clip_sigma: 4.0              # clip extremes so COVID doesn't dominate scaling
+  note: >
+    A full-sample z-score leaks the future mean and standard deviation into every
+    historical observation - a subtle but total look-ahead violation.
+
+composites:
+  # `invert` lists series whose HIGH values mean the OPPOSITE of the composite's
+  # direction, so every composite reads consistently as "higher = more of this".
+  growth:
+    inputs: [CFNAI, INDPRO, UNRATE, ICSA, PERMIT, PAYEMS, UMCSENT]
+    invert: [UNRATE, ICSA]        # rising unemployment / claims = weaker growth
+    method: mean_z
+  inflation:
+    inputs: [CPIAUCSL, CPILFESL, PPIACO]
+    invert: []
+    method: mean_z
+  financial:
+    inputs: [NFCI, ANFCI, BAA10Y, BAA_AAA_SPREAD, T10Y2Y, T10Y3M, T10YFF, VIXCLS]
+    invert: [NFCI, ANFCI, BAA10Y, BAA_AAA_SPREAD, VIXCLS]
+    method: mean_z
+    note: >
+      Higher composite = LOOSER financial conditions. NFCI/ANFCI/spreads/VIX are
+      all inverted because high values there mean tighter or more stressed.
+      Yield-curve slopes are left positive: a steeper curve is the easy-conditions
+      state, an inverted curve the warning.
+  policy:
+    inputs: [FEDFUNDS, GS10, M2SL, DTB3]
+    invert: []
+    method: mean_z
+
+# Derived series computed in features/, not fetched directly from FRED.
+derived_series:
+  BAA_AAA_SPREAD:
+    formula: BAA - AAA
+    frequency: monthly
+    publication_lag_days: 5
+    note: >
+      Classic default-risk spread, monthly back to 1919 - the longest credit
+      stress measure available anywhere on FRED.
+  REAL_FED_FUNDS:
+    formula: FEDFUNDS - CPIAUCSL_yoy
+    frequency: monthly
+    publication_lag_days: 16      # gated by the SLOWER input (CPI), not the faster
+    note: >
+      Lag is the max of its inputs' lags. A derived series is only as timely as its
+      slowest component - a subtle way look-ahead creeps back in.
+
+# ---------------------------------------------------------------------------
+# MODEL A - Growth x Inflation quadrants (Bridgewater "four quadrants")
+# ---------------------------------------------------------------------------
+quadrant_model:
+  growth_axis: growth_composite
+  inflation_axis: inflation_composite
+  axis_definition: momentum    # sign of 3m change, not level: the quadrants are
+                               # about DIRECTION of surprise, not absolute level
+  deadband_sigma: 0.25         # dead zone to stop whipsaw around zero
+  confirm_months: 2            # require 2 consecutive months before switching
+  states:
+    goldilocks:  {growth: up,   inflation: down}
+    reflation:   {growth: up,   inflation: up}
+    stagflation: {growth: down, inflation: up}
+    deflation:   {growth: down, inflation: down}
+  caveat: >
+    Bridgewater's actual framing is growth/inflation relative to what markets have
+    DISCOUNTED, which is not recoverable from FRED. We use realized momentum vs
+    trend and state this limitation openly rather than overclaiming.
+
+# ---------------------------------------------------------------------------
+# MODEL B - Business cycle phases
+# ---------------------------------------------------------------------------
+cycle_model:
+  level_axis: growth_composite
+  momentum_axis: growth_composite_3m_change
+  deadband_sigma: 0.25
+  confirm_months: 2
+  states:
+    expansion: {level: high, momentum: up}
+    slowdown:  {level: high, momentum: down}
+    recession: {level: low,  momentum: down}
+    recovery:  {level: low,  momentum: up}
+
+# ---------------------------------------------------------------------------
+# MODEL C - Gaussian HMM (unsupervised)
+# ---------------------------------------------------------------------------
+hmm:
+  features: [growth_composite, inflation_composite, financial_composite]
+  n_states: 3                  # SELECTED empirically - see note below, not assumed
+  n_states_grid: [2, 3, 4, 5, 6]
+  selection_criterion: stability_and_episode_adequacy
+  selection_note: >
+    The brief assumed 4 states because the economic story has four. The data does
+    not support that. Measured on this feature set (1966-2026, verified 2026-09-05):
+      - BIC falls MONOTONICALLY from K=2 (2811) to K=8 (1804). It never turns, so it
+        selects nothing - it just rewards parameters.
+      - Held-out likelihood is non-monotonic and unstable, because the held-out tail
+        contains COVID; whichever K best accommodates that one event "wins" for
+        reasons unrelated to regime structure.
+      - Seed-to-seed stability (adjusted Rand index) falls from 0.78 at K=3 to ~0.5
+        at K=4-6: different random starts invent different regime histories.
+      - K>=4 leaves states entered only 4 times. The effective sample is EPISODES,
+        not months, and 4 episodes cannot support a conditional return estimate.
+    K=3 is therefore chosen on stability and episode adequacy. The three states
+    recovered are economically legible (contraction / disinflationary expansion /
+    inflationary expansion) and each is entered at least 8 times.
+  covariance_type: diag        # full covariance = ~95 free params on ~4 recessions
+  n_init: 20                   # EM is non-convex; take best log-likelihood
+  random_seed: 42
+  max_iter: 500
+
+  # --- The three anti-look-ahead requirements ---
+  probability_type: filtered   # P(state_t | data <= t). NOT hmmlearn's
+                               # predict()/predict_proba(), which are full-sample
+                               # smoothed and produce fictitious backtests.
+  refit:
+    method: expanding_window
+    initial_train_months: 180  # 15y burn-in before first live signal
+    refit_every_months: 12     # refit yearly on data up to t only
+  state_labelling:
+    method: sort_by_growth_mean   # deterministic remap after EVERY refit
+    note: >
+      HMM states are unidentified - "state 0" in a 1995 refit has no relation to
+      "state 0" in a 2010 refit. Without deterministic relabelling the regime
+      timeline is pure noise.
+
+  covid_handling:
+    mode: report_both          # headline results with AND without Mar-Apr 2020
+    note: >
+      COVID is a 2-month recession with 5-sigma moves. Under a Gaussian likelihood
+      it claims its own state and distorts every covariance estimate.
+
+# ---------------------------------------------------------------------------
+validation:
+  nber_series: USREC
+  metrics: [precision, recall, f1, lead_lag_months, false_positive_count]
+  known_false_positive_episodes:   # growth scares that were NOT recessions
+    - "1998"      # LTCM / Russia
+    - "2011"      # US downgrade / euro crisis
+    - "2015-2016" # industrial / China slowdown
+    - "2022"      # inflation shock, no NBER recession
+
+statistics:
+  overlapping_returns_correction: newey_west   # 12m forward returns overlap 11
+                                               # months; naive t-stats inflate ~sqrt(12)
+  newey_west_lags: auto
+  bootstrap:
+    method: stationary          # Politis-Romano
+    n_iterations: 5000
+    block_length_months: 12
+  deflated_sharpe: true         # penalise for number of configurations tried

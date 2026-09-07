@@ -1,0 +1,6 @@
+,asset,name,role,source,start,end,months
+0,equity,US Equities,growth_asset,SPY from 1993-02-01; external proxy before,1926-07-31,2026-09-30,1203
+1,bonds,Long US Treasuries,deflation_hedge,TLT from 2002-08-01; FRED-derived proxy before,1953-05-31,2026-09-30,881
+2,gold,Gold,inflation_hedge,GLD from 2004-11-01; external proxy before,2000-09-30,2026-09-30,304
+3,commodities,Broad Commodities,inflation_hedge,DBC from 2006-02-01; FRED-derived proxy before,1913-02-28,2026-09-30,1363
+4,cash,Cash / T-Bills,safe_asset,BIL from 2007-05-01; FRED-derived proxy before,1954-02-28,2026-09-30,871

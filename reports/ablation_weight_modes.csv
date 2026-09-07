@@ -1,0 +1,17 @@
+weight_mode,cell,n_biases,A_ignore_lag,B_smoothed,C_full_sample,sharpe,ann_return_%,max_drawdown_%,sharpe_inflation
+fixed,none (honest),0,False,False,False,1.02,10.08,-23.3,0.0
+fixed,C,1,False,False,True,0.99,9.2,-29.6,-0.03
+fixed,B,1,False,True,False,1.052,10.39,-22.6,0.032
+fixed,A,1,True,False,False,0.916,8.98,-26.93,-0.104
+fixed,BC,2,False,True,True,1.027,9.54,-29.07,0.007
+fixed,AC,2,True,False,True,1.001,9.29,-29.07,-0.019
+fixed,AB,2,True,True,False,0.981,9.6,-28.46,-0.039
+fixed,ABC,3,True,True,True,1.041,9.68,-29.07,0.021
+optimized,none (honest),0,False,False,False,1.117,9.48,-31.13,0.0
+optimized,C,1,False,False,True,1.12,9.08,-22.08,0.003
+optimized,B,1,False,True,False,1.103,9.43,-29.68,-0.014
+optimized,A,1,True,False,False,1.125,10.0,-28.63,0.008
+optimized,BC,2,False,True,True,1.069,8.81,-26.1,-0.048
+optimized,AC,2,True,False,True,1.093,9.03,-26.59,-0.024
+optimized,AB,2,True,True,False,0.898,8.61,-56.65,-0.219
+optimized,ABC,3,True,True,True,1.114,9.24,-22.95,-0.003

@@ -1,0 +1,40 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run full pipeline",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "macroregime.run",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Run pipeline (refresh data from FRED)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "macroregime.run",
+      "args": ["--refresh"],
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Streamlit dashboard",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "streamlit",
+      "args": ["run", "app/dashboard.py"],
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Pytest (current file)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["${file}", "-v"],
+      "console": "integratedTerminal",
+      "justMyCode": false
+    }
+  ]
+}

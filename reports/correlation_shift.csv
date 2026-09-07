@@ -1,0 +1,6 @@
+,regime,correlation,n_months
+0,ALL (unconditional),0.083,679
+1,expansion,0.016,152
+2,recession,0.119,220
+3,recovery,-0.037,131
+4,slowdown,0.168,176

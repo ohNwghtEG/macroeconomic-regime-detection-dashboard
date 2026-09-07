@@ -1,0 +1,264 @@
+# ---------------------------------------------------------------------------
+# FRED series registry with REAL publication lags.
+#
+# WHY THIS FILE EXISTS
+# FRED serves the latest *revised* value for every historical date. If you align
+# CPI for March 2008 to March 2008, you are backtesting on a number that did not
+# exist until mid-April 2008 (and whose current value reflects revisions made
+# years later). `publication_lag_days` is the number of days after the END of the
+# reference period at which the first estimate was actually released.
+#
+# Feature row for month-end T may only use observations whose
+#   release_date = period_end + publication_lag_days
+# is <= T. This is enforced by tests/test_no_lookahead.py, not by convention.
+#
+# Lags are rounded UP (conservative): being too slow understates performance,
+# being too fast fabricates it.
+#
+# Availability last verified against the live FRED API: 2026-09-05.
+# ---------------------------------------------------------------------------
+
+macro_series:
+
+  # ---------------- GROWTH ----------------
+  - id: CFNAI
+    name: Chicago Fed National Activity Index
+    dimension: growth
+    frequency: monthly
+    publication_lag_days: 27      # released near end of following month
+    transform: level              # already a standardized diffusion index
+    note: >
+      Stands in for ISM PMI, which FRED removed in 2016 over ISM licensing.
+      An 85-indicator composite; arguably a broader activity gauge than the PMI.
+
+  - id: INDPRO
+    name: Industrial Production Index
+    dimension: growth
+    frequency: monthly
+    publication_lag_days: 17      # ~15th-17th of following month
+    transform: yoy
+
+  - id: UNRATE
+    name: Unemployment Rate
+    dimension: growth
+    frequency: monthly
+    publication_lag_days: 8       # first Friday of following month
+    transform: diff3              # 3-month change; rising unemployment is the
+                                  # cleanest recession signal. Level is non-stationary.
+
+  - id: ICSA
+    name: Initial Jobless Claims
+    dimension: growth
+    frequency: weekly
+    publication_lag_days: 5       # Thursday, for week ending prior Saturday
+    transform: pct13w
+    note: >
+      Weekly and barely revised - the most timely recession indicator available.
+      Its absence is the biggest gap in the original spec's feature set.
+
+  - id: PERMIT
+    name: New Private Housing Building Permits
+    dimension: growth
+    frequency: monthly
+    publication_lag_days: 19
+    transform: yoy
+    note: Classic leading indicator - housing turns before the cycle does.
+
+  - id: PAYEMS
+    name: Total Nonfarm Payrolls
+    dimension: growth
+    frequency: monthly
+    publication_lag_days: 8
+    transform: yoy
+    note: Included partly to showcase revision analysis (heavily revised at turns).
+
+  - id: UMCSENT
+    name: University of Michigan Consumer Sentiment
+    dimension: growth
+    frequency: monthly
+    publication_lag_days: 2       # final release lands late in the reference month
+    transform: diff12
+    note: Survey-based leading indicator, back to 1952.
+
+  # ---------------- INFLATION ----------------
+  - id: CPIAUCSL
+    name: CPI All Urban Consumers (SA)
+    dimension: inflation
+    frequency: monthly
+    publication_lag_days: 16      # ~12th-15th of following month
+    transform: yoy
+
+  - id: CPILFESL
+    name: Core CPI (ex food & energy, SA)
+    dimension: inflation
+    frequency: monthly
+    publication_lag_days: 16
+    transform: yoy
+
+  - id: PPIACO
+    name: Producer Price Index (All Commodities)
+    dimension: inflation
+    frequency: monthly
+    publication_lag_days: 17
+    transform: yoy
+
+  # ---------------- FINANCIAL CONDITIONS ----------------
+  - id: NFCI
+    name: Chicago Fed National Financial Conditions Index
+    dimension: financial
+    frequency: weekly
+    publication_lag_days: 5       # Wednesday, for week ending prior Friday
+    transform: level              # already standardized (mean 0, sd 1)
+    note: >
+      PRIMARY financial conditions measure: 105 indicators of risk, credit and
+      leverage, weekly back to 1971.
+      Replaces BAMLH0A0HYM2 from the original spec. FRED now serves the ICE BofA
+      high-yield OAS only for a rolling ~3-year window (verified 2026-09-05:
+      metadata observation_start = 2023-09-05) because ICE restricted the history.
+      Three years spans no complete cycle and is unusable for regime work.
+
+  - id: ANFCI
+    name: Adjusted National Financial Conditions Index
+    dimension: financial
+    frequency: weekly
+    publication_lag_days: 5
+    transform: level
+    note: >
+      NFCI with the component explained by growth and inflation stripped out, so it
+      isolates financial stress ORTHOGONAL to the macro cycle. Valuable precisely
+      because it is not mechanically collinear with the growth composite.
+
+  - id: BAA10Y
+    name: Moody's Baa Corporate Yield minus 10Y Treasury
+    dimension: financial
+    frequency: daily
+    publication_lag_days: 1
+    transform: level
+    note: Direct credit-risk premium, daily back to 1986.
+
+  - id: BAA
+    name: Moody's Seasoned Baa Corporate Bond Yield
+    dimension: financial
+    frequency: monthly
+    publication_lag_days: 5
+    transform: level
+    note: >
+      Paired with AAA to build the classic Baa-Aaa default spread, available back
+      to 1919 - by far the longest-history credit stress measure on FRED.
+
+  - id: AAA
+    name: Moody's Seasoned Aaa Corporate Bond Yield
+    dimension: financial
+    frequency: monthly
+    publication_lag_days: 5
+    transform: level
+
+  - id: T10Y2Y
+    name: 10Y minus 2Y Treasury Spread
+    dimension: financial
+    frequency: daily
+    publication_lag_days: 1
+    transform: level
+    note: Market data - effectively contemporaneous, no revision risk. From 1976.
+
+  - id: T10Y3M
+    name: 10Y minus 3M Treasury Spread
+    dimension: financial
+    frequency: daily
+    publication_lag_days: 1
+    transform: level
+    note: Better recession predictor than 10Y-2Y in most of the literature. From 1982.
+
+  - id: T10YFF
+    name: 10Y Treasury minus Fed Funds Rate
+    dimension: financial
+    frequency: daily
+    publication_lag_days: 1
+    transform: level
+    note: >
+      Third curve measure, and the longest - daily back to 1962. Extends the
+      financial dimension roughly 14 years further than T10Y2Y allows.
+
+  - id: VIXCLS
+    name: CBOE Volatility Index
+    dimension: financial
+    frequency: daily
+    publication_lag_days: 1
+    transform: level
+    note: Equity-implied volatility, from 1990.
+
+  # ---------------- POLICY ----------------
+  - id: FEDFUNDS
+    name: Effective Federal Funds Rate
+    dimension: policy
+    frequency: monthly
+    publication_lag_days: 2
+    transform: diff12
+    note: >
+      Combined with CPI to build a real policy rate. The original spec had no
+      monetary policy dimension at all.
+
+  - id: GS10
+    name: 10-Year Treasury Constant Maturity Rate
+    dimension: policy
+    frequency: monthly
+    publication_lag_days: 2
+    transform: level
+    note: Also used to construct a long-history bond total-return proxy.
+
+  - id: M2SL
+    name: M2 Money Stock
+    dimension: policy
+    frequency: monthly
+    publication_lag_days: 27      # released ~4th week of the following month
+    transform: yoy
+    note: Money growth - the liquidity dimension the original spec omitted entirely.
+
+  - id: DTB3
+    name: 3-Month Treasury Bill Rate
+    dimension: policy
+    frequency: daily
+    publication_lag_days: 1
+    transform: level
+    note: Also used to accrue the cash leg of the portfolio pre-2007.
+
+# ---------------------------------------------------------------------------
+# VALIDATION-ONLY series. These must NEVER enter the feature matrix.
+# NBER dates are announced 6-18 months after the fact; using them as a feature
+# would be the most extreme look-ahead possible. registry.SeriesSpec.is_feature
+# hard-blocks them rather than relying on discipline.
+# ---------------------------------------------------------------------------
+validation_series:
+  - id: USREC
+    name: NBER Recession Indicator
+    frequency: monthly
+    publication_lag_days: 365     # announced with a long and variable lag
+    usage: validation_only
+
+  - id: SAHMREALTIME
+    name: Real-time Sahm Rule Recession Indicator
+    frequency: monthly
+    publication_lag_days: 8
+    usage: benchmark
+    note: >
+      A purpose-built real-time recession signal published by FRED. Used as a
+      benchmark to beat, not as a feature - if our model cannot outperform this
+      one-line rule, that is an important negative result worth reporting.
+
+# ---------------------------------------------------------------------------
+# Series deliberately EXCLUDED, recorded so the decision is auditable.
+# ---------------------------------------------------------------------------
+excluded_series:
+  - id: BAMLH0A0HYM2
+    reason: >
+      FRED serves only a rolling ~3-year window as of 2026-09-05 (ICE licensing
+      restriction). Was the credit-spread feature in the original spec.
+      Replaced by NFCI, ANFCI, BAA10Y and the Baa-Aaa spread.
+  - id: NAPM
+    reason: ISM PMI - removed from FRED in 2016 over ISM licensing. Replaced by CFNAI.
+  - id: TEDRATE
+    reason: Discontinued 2022-01-21. Replaced by NFCI for funding stress.
+  - id: SP500
+    reason: >
+      FRED serves only ~10 years of the S&P 500. Equity history comes from
+      yfinance instead (see assets.yaml).
