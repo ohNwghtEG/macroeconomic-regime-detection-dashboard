@@ -2,9 +2,17 @@
 
 **Evidence from a fully real-time macroeconomic regime-switching pipeline**
 
+**Ethan Gao**
+*Independent researcher*
+
 ---
 
-*Working paper. Draft of September 2026. Revision 5.*
+*Working paper. Revision 5, September 2026.*
+
+Code, data and the test suite that reproduces every figure in this paper:
+`https://github.com/ohNwghtEG/macroeconomic-regime-detection-dashboard`
+
+Code is released under the MIT License; this manuscript under CC BY 4.0.
 
 ---
 
@@ -399,6 +407,32 @@ The explanation is not that regime models work, nor that they fail, but that a b
 This is a bounded claim, and we prefer it bounded. Large effects remain testable, though not uniformly: a strategy promising 0.5 Sharpe over a benchmark can be evaluated in six years at ρ = 0.95 but needs twenty-five at ρ = 0.76. But a field that debates 0.1 Sharpe differences using 25-year samples is not doing weak empirical work so much as work whose central quantity is not estimable from the available evidence. The appropriate response is not better hygiene — we applied the best hygiene we know and it changed nothing — but a change in which questions are asked, and considerably more humility about which have been answered.
 
 Including ours.
+
+---
+
+## Disclosure of methods and tooling
+
+This paper and its accompanying pipeline were developed with the assistance of an
+AI coding assistant (Anthropic Claude), used for implementation, drafting, and
+iterative review. The author directed the research questions, adjudicated the
+methodological choices, and is responsible for all claims.
+
+The disclosure is made for two reasons beyond convention. First, several of the
+substantive turns in this project - the discovery that the conventional
+credit-spread series is no longer served in usable form, the finding that
+information criteria do not identify a state count here, and each of the three
+unit errors documented in Section 1.1 - emerged from that iterative process, and
+the paper's argument about verification is not separable from how it was written.
+
+Second, and more importantly, the argument of this paper is that trust in a
+quantitative result should rest on mechanical reproducibility rather than on
+confidence in the care of whoever produced it. That standard does not become less
+applicable when the producer is partly a machine; if anything it becomes more so.
+Every figure reported here is regenerated from the committed data by the commands
+in Appendix A, and `tests/test_units_and_tables.py` reconstructs each published
+table cell from its primitives and fails if the manuscript and the code disagree.
+Readers are invited to verify the numbers rather than to take either author's word
+for them.
 
 ---
 
