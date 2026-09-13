@@ -1,0 +1,3 @@
+This project has been the most fun I've had while coding. Sure, I've had my frustrations, but I've been able to optimize my code over and over again, find errors I could fix, and improve areas I never would have looked at a few months ago. 
+In my two previous projects, retro-mindsweeper and "multi-asset-portfolio-risk-dashboard", I never used folders and organized my code in such a manner like this project. This experience has meant so much to me that I've written an entire research
+paper on my discoveries using my code model. 
