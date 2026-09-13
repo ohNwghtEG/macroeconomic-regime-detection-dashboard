@@ -8,6 +8,14 @@ authors:
   - given-names: Ethan
     family-names: Gao
 repository-code: https://github.com/ohNwghtEG/macroeconomic-regime-detection-dashboard
+doi: 10.5281/zenodo.22737847
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.22737847
+    description: Concept DOI - resolves to the latest archived version
+  - type: doi
+    value: 10.5281/zenodo.22737848
+    description: Version DOI for release v1.0-preprint
 abstract: >-
   A macroeconomic regime-detection and asset-allocation pipeline built to
   institutional real-time standards - point-in-time data honouring each series'
@@ -31,5 +39,5 @@ keywords:
   - tactical asset allocation
   - reproducibility
 license: MIT
-version: 1.0.0
+version: v1.0-preprint
 date-released: "2026-09-09"

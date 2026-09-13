@@ -1,5 +1,7 @@
 # Macroeconomic Regime Detection
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22737848.svg)](https://doi.org/10.5281/zenodo.22737848)
+
 **I built a systematic macro regime model, tested whether it beats a static 60/40, and found that a backtest of realistic length cannot answer the question.**
 
 Over 44.6 years of point-in-time data, the walk-forward hidden Markov model returns an excess-return Sharpe of **0.655** against a rebalanced 60/40's **0.682** (p = 0.64). Nothing beats the benchmark. But the more useful result is *why* that null is uninformative: the study had between **5% and 34% power** against the effects it observed, and detecting a 0.1 Sharpe improvement would require between **128 and 610 years** of monthly data depending on the correlation between strategy and benchmark.
@@ -41,7 +43,7 @@ Two things fall out. Required sample scales with **1/δ²**, so halving the effe
 | 0.89 | 281 |
 | 0.95 | 128 |
 
-Our five comparisons span ρ = 0.76 to 0.95. Even the most favourable needs 128 years against the 44.6 available.
+My five comparisons span ρ = 0.76 to 0.95. Even the most favourable needs 128 years against the 44.6 available.
 
 ---
 
