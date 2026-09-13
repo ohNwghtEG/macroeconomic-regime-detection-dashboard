@@ -476,7 +476,7 @@ All results are generated from a committed data cache and require no API credent
 python -m macroregime.run                # pipeline and primary results
 python -m macroregime.evaluation.power   # Section 7
 python -m macroregime.viz.report         # static HTML report
-pytest                                   # 49 tests: look-ahead proofs, unit
+pytest                                   # 50 tests: look-ahead proofs, unit
                                          # conventions, and published-table regression
 ```
 
@@ -500,6 +500,5 @@ Every error found in review was a scale factor applied in the wrong power, and e
 | `ablation_weight_modes.csv` | Fixed vs optimised weighting |
 | `power_reconciliation.csv` | Section 7.2 pinned per-comparison standard errors |
 | `power_years_by_rho.csv` | Section 7.3 sample-size requirements by ρ |
-| `power_gaussian.csv`, `power_empirical.csv` | Simulation-based power |
 | `vs_sahm.csv`, `nber_lead_lag.csv` | Recession-classification validation |
 | `staleness.csv` | Per-series publication lag at decision points |

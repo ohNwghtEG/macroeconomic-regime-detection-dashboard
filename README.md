@@ -98,7 +98,7 @@ python -m macroregime.run                # pipeline and primary results
 python -m macroregime.evaluation.power   # power analysis (Paper §7)
 python -m macroregime.viz.report         # static HTML report
 streamlit run app/dashboard.py           # interactive dashboard
-pytest                                   # 48 tests
+pytest                                   # 50 tests
 ```
 
 To refresh from source, add a free [FRED key](https://fred.stlouisfed.org/docs/api/api_key.html) to `.env` and pass `--refresh`.

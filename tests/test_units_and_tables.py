@@ -523,3 +523,25 @@ def test_correlation_range_matches_generated_data():
     text = _paper().read_text(encoding="utf-8").replace("−", "-")
     assert f"{lo:.2f}" in text, f"lower bound {lo:.2f} absent (paper must not quote a higher one)"
     assert f"{hi:.2f}" in text, f"upper bound {hi:.2f} absent"
+
+
+def test_every_cited_artefact_exists():
+    """Every generated file the manuscript names must actually exist.
+
+    Appendix A once listed power_gaussian.csv and power_empirical.csv as
+    reproducible artefacts after the module that wrote them had been rewritten
+    and no longer produced either. A reproducibility appendix that cites files a
+    reader cannot find is the failure the appendix exists to rule out.
+    """
+    tick = chr(96)
+    text = _paper().read_text(encoding="utf-8")
+    pattern = tick + r"([A-Za-z0-9_./-]+\.(?:csv|json|html|py|pdf))" + tick
+    cited = sorted(set(re.findall(pattern, text)))
+    assert cited, "expected the manuscript to cite at least one artefact"
+
+    def exists(name: str) -> bool:
+        candidates = [ROOT / name, REPORT_DIR / name, ROOT / "src" / "macroregime" / name]
+        return any(c.exists() for c in candidates)
+
+    missing = [c for c in cited if not exists(c)]
+    assert not missing, f"manuscript cites artefacts that do not exist: {missing}"

@@ -27,6 +27,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0", "ruff>=0.4"]
+paper = ["reportlab>=4.0", "pypdf>=4.0"]   # scripts/build_paper_pdf.py
 
 [tool.setuptools.packages.find]
 where = ["src"]
