@@ -365,7 +365,7 @@ def footer(canvas, doc) -> None:
     canvas.setFont(SERIF, 8.5)
     canvas.setFillColor(colors.HexColor("#4B5563"))
     canvas.drawString(doc.leftMargin, 0.55 * inch,
-                      "Gao \u2014 Underpowered by Construction (working paper)")
+                      "Gao, Underpowered by Construction (working paper)")
     canvas.drawRightString(letter[0] - doc.rightMargin, 0.55 * inch, str(doc.page))
     canvas.restoreState()
 
