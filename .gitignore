@@ -19,6 +19,9 @@ data/raw/
 reports/_intermediate/
 .ipynb_checkpoints/
 
+# Journal submissions - must not be posted publicly while under review
+journal/
+
 # OS
 .DS_Store
 Thumbs.db
