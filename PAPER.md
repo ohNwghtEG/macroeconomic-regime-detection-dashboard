@@ -21,7 +21,7 @@ Code is released under the MIT License; this manuscript under CC BY 4.0.
 
 I build a macroeconomic regime-detection and asset-allocation pipeline using point-in-time data that respects each series' publication lag, forward-filtered hidden Markov state probabilities, and expanding-window parameter re-estimation. I then use it to ask whether a backtest of realistic length is able to tell if such a strategy works at all.
 
-For effect sizes in the range the field actually argues about, it cannot. Over 535 months (44.6 years), no regime-based allocation differs significantly from a rebalanced 60/40 benchmark. The walk-forward hidden Markov model returns an excess-return Sharpe of 0.655 against the benchmark's 0.682 (Δ = −0.027, p = 0.64). I also ran a 2×2×2 factorial ablation that deliberately reintroduces three forms of look-ahead bias, and none of the fourteen resulting tests survives multiple-testing correction. The fully naive implementation scores 0.654 against the honest 0.655. Repeating the ablation with in-sample-optimised regime weights does not change this.
+For effect sizes in the range the field actually argues about, it cannot. Over 535 months (44.6 years), no regime-based allocation differs significantly from a rebalanced 60/40 benchmark. The walk-forward hidden Markov model returns an excess-return Sharpe of 0.655 against the benchmark's 0.682 (Δ = −0.027, p = 0.64). I also ran a 2×2×2 factorial ablation that deliberately reintroduces three forms of look-ahead bias, once with fixed regime weights and once with in-sample-optimised weights. None of the fourteen resulting tests survives multiple-testing correction, and with fixed weights the fully naive implementation scores 0.654 against the honest 0.655.
 
 The explanation is statistical power, which can be computed in closed form. Using the Jobson–Korkie statistic with the Memmel correction, the sample length needed to detect a true Sharpe difference Δ at 80% power depends on Δ, the benchmark Sharpe, and the correlation ρ between the two strategies. The correlation matters most, and it is almost never reported. Across the five comparisons in my study ρ ranges from 0.76 to 0.95, and the sample required to detect Δ = 0.10 falls correspondingly from **610 years to 128 years**. Even the most favourable case needs nearly three times the history that exists.
 
@@ -161,13 +161,13 @@ This result illustrates the paper's thesis more directly than anything else in t
 | 1981 | 3-asset | 45.5 | 0.613 | 0.638 | −0.025 | 0.757 |
 | 1970 | 3-asset | 56.5 | 0.477 | 0.510 | −0.033 | 0.639 |
 
-The extremes differ by 0.166 Sharpe and carry opposite signs. A researcher reporting only the first row would describe a successful strategy, and one reporting only the last would describe a failure.
+The estimates range from +0.133 to −0.067, a spread of 0.200, and they change sign. A researcher reporting only the first row would describe a successful strategy, and one reporting only the 1990 row would describe a failure.
 
-The spread should be read as instability in the estimate. Every row has p between 0.39 and 0.76, so no row is distinguishable from zero, and the gap between rows cannot be taken to mean that asset-set choice is "worth" 0.166 Sharpe. What the table does show is that defensible specification choices move the point estimate by more than the size of the estimate itself. That says something about the resolution of the method and nothing about a causal magnitude. Treating the spread as an effect size would be the same inferential mistake this paper warns about elsewhere.
+The spread should be read as instability in the estimate. Every row has p between 0.39 and 0.76, so no row is distinguishable from zero, and the gap between rows cannot be taken to mean that these choices are "worth" 0.200 Sharpe. What the table does show is that defensible specification choices move the point estimate by more than the size of the estimate itself. That says something about the resolution of the method and nothing about a causal magnitude. Treating the spread as an effect size would be the same inferential mistake this paper warns about elsewhere.
 
-It is worth being specific about where the swing comes from. The 2001 specification differs in two ways at once: it has a later start date *and* a fourth asset (gold, whose usable history begins in 2000 and therefore forces the short window). Comparing three-asset samples with each other, the pure start-date effect is small, −0.033 at 1970 versus −0.050 at 1996, a range of 0.017. Most of the swing therefore comes from the **asset universe**, with the shorter window following from that choice.
+It is worth being specific about where the swing comes from. The 2001 specification differs in two ways at once: it has a later start date *and* a fourth asset (gold, whose usable history begins in 2000 and therefore forces the short window). When the four three-asset samples are compared with each other, the start-date effect is much smaller: their estimates range from −0.067 to −0.025, a spread of 0.042. Most of the swing therefore comes from the **asset universe**, with the shorter window following from that choice.
 
-If anything this makes the illustration stronger. Including gold in a regime study is a perfectly reasonable decision; gold is the standard inflation hedge, and it is leaving it out that needs justifying. A choice made for good substantive reasons moves the estimate by more than all of the look-ahead channels in Section 5 combined.
+If anything this makes the illustration stronger. Including gold in a regime study is a perfectly reasonable decision; gold is the standard inflation hedge, and it is leaving it out that needs justifying. A choice made for good substantive reasons moves the estimate by more than any single look-ahead channel in Section 5.
 
 ### 4.3 The momentum benchmark
 
@@ -237,7 +237,7 @@ The results do not support the hypothesis. No cell in the optimised design reach
 
 The most likely reason is that the optimiser already sees full-sample *returns* in every cell, so leaking regime *identity* as well adds little. Three regimes mapped onto three assets also leave limited room to exploit it. A richer asset universe might give a different answer.
 
-In-sample optimisation on its own raised the Sharpe from 0.655 to 0.688. That is more than any look-ahead channel moved it, although it is not significant either.
+In-sample optimisation on its own raised the Sharpe from 0.655 to 0.688. That is a larger gain than any look-ahead channel produced, although it is not significant either.
 
 ---
 
@@ -299,7 +299,7 @@ The table below uses *S*₂ = 0.682, 80% power and α = 0.05, with the measured 
 | 0.92 | 814 | **204** | 52 | 23 | 9 |
 | 0.95 | 509 | **128** | 33 | 15 | 6 |
 
-The ρ values in the table are the ones actually observed across the five comparisons in Section 4.1. Detecting Δ = 0.10 takes between one and six centuries depending on the pair. Even the most favourable case, my HMM against 60/40 at ρ = 0.952, needs 128 years, and only 44.6 are available.
+The ρ values in the table span the range actually observed across the five comparisons in Section 4.1. Detecting Δ = 0.10 takes between one and six centuries depending on the pair. Even the most favourable case, my HMM against 60/40 at ρ = 0.952, needs 128 years, and only 44.6 are available.
 
 As a rough check on scale, I also took each comparison's own bootstrap standard error and solved directly for the sample at which the effect becomes detectable. For the HMM pair this gives 139 years, compared with 128 from the table at ρ = 0.95, a gap that is within the variation described in Section 7.2.
 
@@ -343,7 +343,7 @@ A lot of effort in this literature, including much of mine in this project, goes
 
 This result needs to be read with care. It does **not** show that look-ahead bias is unimportant, because my power against effects of that size was 5–7% for the relevant comparisons. What it shows is that the effort changed no conclusion in this study, and that removing look-ahead bias does not by itself make a study's results informative.
 
-Selection looks like a larger threat. The specification-sensitivity result in Section 4.2, a 0.166 swing that reverses sign after the defensible decision to include gold, spans a wider range than any bias I introduced on purpose. As that section notes, the swing describes how unstable the estimate is and should not be read as a measured effect.
+Selection looks like a larger threat. The specification-sensitivity result in Section 4.2, a swing of up to 0.200 that reverses sign and comes mainly from the defensible decision to include gold, spans a wider range than any bias I introduced on purpose. As that section notes, the swing describes how unstable the estimate is and should not be read as a measured effect.
 
 ### 8.4 Recommendations
 
@@ -375,7 +375,7 @@ The power analysis assumes the true effect is stable over time. If the benefit o
 
 The closed form assumes i.i.d. returns. I correct for this empirically with a standard-error ratio of 1.248 (variance 1.558) measured at pinned parameters in Section 7.2, but I do not model the dependence structure analytically. Because that ratio mixes non-normality with serial dependence and varies across comparisons (1.15–1.34), the Section 7.3 figures are approximate. Ledoit and Wolf (2008) offer a more rigorous approach.
 
-Neither the power argument nor the sample-length expression is new. Harvey and Liu (2015), Harvey, Liu and Zhu (2016), and Bailey and López de Prado (2014) make closely related points about backtest inference, and Opdyke (2007) and Bailey and López de Prado (2012) give closely related minimum-sample results. What this paper adds is the application of the expression across realistic values of ρ, the per-comparison detectability table, and a complete, reproducible pipeline to which both are applied, including my own results.
+Neither the power argument nor the sample-length expression is new. Harvey and Liu (2015), Harvey, Liu and Zhu (2016), and Bailey and López de Prado (2014) make closely related points about backtest inference, and Opdyke (2007) and Bailey and López de Prado (2012) give closely related minimum-sample results. What this paper adds is the application of the expression across realistic values of ρ, the per-comparison detectability table, and a complete, reproducible pipeline on which both are demonstrated using my own results.
 
 ---
 
@@ -395,7 +395,7 @@ Large effects can still be tested, though not in every case. A strategy promisin
 
 During this project I used Anthropic's Claude, through the Claude Code tool, to write and debug code, draft and edit text, and review calculations. I set the research questions, made the methodological decisions, and checked the results, and I take full responsibility for the content of the paper.
 
-I did not rely on the tool's output being correct. Every figure in the paper is generated by code in the public repository and can be regenerated from the committed data with the commands in Appendix A. The test suite in `tests/test_units_and_tables.py` recomputes each published table value from its inputs and fails if the paper and the code disagree, so an error in the reported numbers shows up as a failing test whoever introduced it. Readers can run the suite and check the results for themselves.
+I did not rely on the tool's output being correct. Every figure in the paper is generated by code in the public repository and can be regenerated from the committed data with the commands in Appendix A. The test suite in `tests/test_units_and_tables.py` recomputes each published table value from its inputs and fails if the paper and the code disagree, so an error in the reported numbers shows up as a failing test, whoever introduced it. Readers can run the suite and check the results for themselves.
 
 ---
 
