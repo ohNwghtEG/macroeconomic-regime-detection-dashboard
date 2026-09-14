@@ -7,7 +7,7 @@
 
 ---
 
-*Working paper. Revision 6, September 2026.*
+*Working paper. September 2026.*
 
 Code, data and the test suite that reproduces every figure in this paper:
 `https://github.com/ohNwghtEG/macroeconomic-regime-detection-dashboard`
@@ -23,9 +23,9 @@ I build a macroeconomic regime-detection and asset-allocation pipeline using poi
 
 For effect sizes in the range the field actually argues about, it cannot. Over 535 months (44.6 years), no regime-based allocation differs significantly from a rebalanced 60/40 benchmark. The walk-forward hidden Markov model returns an excess-return Sharpe of 0.655 against the benchmark's 0.682 (Δ = −0.027, p = 0.64). I also ran a 2×2×2 factorial ablation that deliberately reintroduces three forms of look-ahead bias, and none of the fourteen resulting tests survives multiple-testing correction. The fully naive implementation scores 0.654 against the honest 0.655. Repeating the ablation with in-sample-optimised regime weights does not change this.
 
-The explanation is statistical power, which I derive in closed form. Using the Jobson–Korkie statistic with the Memmel correction, the sample length needed to detect a true Sharpe difference Δ at 80% power depends on Δ, the benchmark Sharpe, and the correlation ρ between the two strategies. The correlation matters most, and it is almost never reported. Across the five comparisons in my study ρ ranges from 0.76 to 0.95, and the sample required to detect Δ = 0.10 falls correspondingly from **610 years to 128 years**. Even the most favourable case needs nearly three times the history that exists.
+The explanation is statistical power, which can be computed in closed form. Using the Jobson–Korkie statistic with the Memmel correction, the sample length needed to detect a true Sharpe difference Δ at 80% power depends on Δ, the benchmark Sharpe, and the correlation ρ between the two strategies. The correlation matters most, and it is almost never reported. Across the five comparisons in my study ρ ranges from 0.76 to 0.95, and the sample required to detect Δ = 0.10 falls correspondingly from **610 years to 128 years**. Even the most favourable case needs nearly three times the history that exists.
 
-Two pieces of this work are meant for reuse. The first is a per-comparison detectability table (Section 7.4). In this study the minimum detectable effect at 80% power ranges from **0.18 to 0.36 Sharpe** across five comparisons, while the observed effects range from 0.003 to 0.153, giving achieved power of **5% to 34%**. I suggest that studies routinely report the minimum detectable effect next to the observed effect, since a null result is hard to interpret without it. The second is a test suite (Appendix A.2) that rebuilds every published figure from its primitives. Three errors in earlier drafts of this paper turned out to be the same mistake, a scale factor applied in the wrong power. Rereading the drafts missed all three, and recomputing the numbers caught each one straight away, which is a small piece of evidence for the case this paper makes for mechanical verification.
+Two pieces of this work are meant for reuse. The first is a per-comparison detectability table (Section 7.4). In this study the minimum detectable effect at 80% power ranges from **0.18 to 0.36 Sharpe** across five comparisons, while the observed effects range from 0.003 to 0.153, giving achieved power of **5% to 34%**. I suggest that studies routinely report the minimum detectable effect next to the observed effect, since a null result is hard to interpret without it. The second is a test suite (Appendix A.2) that rebuilds every published figure from its primitives and fails if the manuscript and the code disagree.
 
 The implication has limits. Sharpe differences of 0.3 and above can be detected within a career only at high ρ (15 years at ρ = 0.95, 69 at ρ = 0.76). Differences of 0.1 to 0.2, where tactical allocation overlays are usually evaluated and sold, need anywhere from three decades to six centuries, and below ρ = 0.9 they are effectively out of reach. If studies in that range are filtered for significance before publication, most of what gets published will be false positives. The same reasoning applies to my own null results, so I do not read them as evidence that regime models fail.
 
@@ -43,7 +43,7 @@ Methodological criticism of this literature has concentrated on look-ahead bias.
 
 This paper tests that critique directly. I build the pipeline correctly and then, holding everything else fixed, switch each bias back on to measure what it is worth. The measured effects are small and do not survive multiple-testing correction. The more important finding is the reason for that: at these effect sizes, the experiment could never have resolved the question.
 
-The paper provides a fully specified, reproducible real-time regime pipeline whose test suite checks for look-ahead directly, and a factorial ablation of three look-ahead channels with bootstrap confidence intervals and multiple-testing correction, in which no channel survives. Its main contribution, though, is a closed-form expression for the sample length needed to detect a given Sharpe difference, checked against simulation and applied to my own results. That turns a case-specific null into a general statement about what a backtest can establish.
+The paper provides a fully specified, reproducible real-time regime pipeline whose test suite checks for look-ahead directly, and a factorial ablation of three look-ahead channels with bootstrap confidence intervals and multiple-testing correction, in which no channel survives. Its main contribution, though, is to show how the sample length needed to detect a given Sharpe difference depends on the correlation between the strategies being compared. The expression itself is standard, following from Jobson and Korkie (1981) and Memmel (2003), and closely related minimum-sample results appear in Opdyke (2007) and Bailey and López de Prado (2012). What has been missing is its application across the correlations that real comparisons produce, together with a per-comparison statement of what a given study could have detected. Applied to my own results, this turns a case-specific null into a general statement about what a backtest can establish.
 
 The central result can be stated now. For two strategies with per-period Sharpe ratios *S*₁, *S*₂ and correlation ρ, the sample size required to detect a true per-period difference δ at level α and power 1 − β is
 
@@ -53,16 +53,6 @@ Required sample scales with 1/δ², and because of the leading term 2(1 − ρ),
 
 This result also limits what the pipeline and the ablation can show. A study with 5–34% power has not established that look-ahead bias is unimportant.
 
-### 1.1 Note on this revision
-
-An earlier draft reported performance ratios computed on **raw** rather than excess returns. Over this sample the three-month Treasury bill averaged 3.65% annualised (7.80% during the 1980s portion), so those figures overstated risk-adjusted performance by roughly 0.35. Because the Sharpe ratio divides by each strategy's own volatility, they also distorted the differences between strategies. All results here use excess returns. The earlier quantities remain in the output files under the name `return_vol_ratio`, which is an accurate description of them.
-
-Two conclusions changed materially. The price-momentum benchmark no longer outranks 60/40 (Section 4.3), which removes the support an earlier draft claimed for the idea that markets price regimes first. And the specification-sensitivity result is smaller than first reported, and is partly due to the choice of assets rather than the sample window (Section 4.2).
-
-Revision 3 corrects a further error of the same kind: quantities computed under **different parameterisations were compared as though they matched**. The closed-form standard error, the Monte Carlo simulation and the empirical bootstrap were each evaluated at a different correlation ρ (0.90, 0.85 and 0.90 respectively) and on two different samples, and the gap between them was reported as "tail inflation." Once ρ, *S*₁, *S*₂ and *T* are pinned to the same values, the Monte Carlo reproduces the closed form to within 1%. It therefore checks the algebra and does not corroborate anything independently, so an earlier claim that "three independent methods agree" was wrong. Measured consistently, the genuine non-normality inflation is **1.25×** (range 1.15–1.34), somewhat larger than the 1.17× reported before. Section 7 has been rewritten accordingly. Getting the arithmetic right meant following the advice Section 7.1 gives to readers, which is to report ρ rather than assume it.
-
-Revision 4 corrects a third instance. Section 7.3 had applied the measured inflation factor of 1.248 linearly to required sample size. Required sample scales with **variance**, while the factor is a ratio of **standard errors**, so the correct multiplier is 1.248² = 1.558 and every Section 7.3 figure rises by 25%. The omitted risk-free rate, a √12 conflation and this squared-versus-linear slip were all the same mistake of applying a scale factor in the wrong power, and none of them was visible on rereading. I have since added a unit convention (Section 7.1) and a test suite that rebuilds every published table cell from its primitives (`tests/test_units_and_tables.py`).
-
 ---
 
 ## 2. Related literature
@@ -71,7 +61,7 @@ The finding that predictive relationships in finance degrade or vanish out of sa
 
 Regime-switching methodology descends from Hamilton (1989). Applications to allocation include Ang and Bekaert (2002) on regime-dependent international correlations and Kritzman, Page and Turkington (2012), who reported that regime-aware dynamic strategies improved risk-adjusted performance. The latter is exactly the kind of finding I argue cannot be resolved at conventional sample lengths, in either direction.
 
-On inference, Jobson and Korkie (1981) derived the asymptotic distribution of the difference between two Sharpe ratios, and Memmel (2003) corrected an error in their variance expression. That corrected expression is the analytic basis of Section 7. Lo (2002) showed that Sharpe ratio standard errors are substantially larger than commonly assumed under non-normality, and Ledoit and Wolf (2008) developed robust tests under autocorrelation and fat tails. My bootstrap follows Politis and Romano (1994).
+On inference, Jobson and Korkie (1981) derived the asymptotic distribution of the difference between two Sharpe ratios, and Memmel (2003) corrected an error in their variance expression. That corrected expression is the analytic basis of Section 7. Lo (2002) showed that Sharpe ratio standard errors are substantially larger than commonly assumed under non-normality, and Ledoit and Wolf (2008) developed robust tests under autocorrelation and fat tails. Opdyke (2007) extended the test to returns that are serially correlated and non-normal, and gave the minimum number of observations needed to show that one Sharpe ratio exceeds another. Bailey and López de Prado (2012) introduced the minimum track record length, the history required before a single Sharpe ratio can be declared above a chosen threshold. My bootstrap follows Politis and Romano (1994).
 
 The multiple-testing problem in backtesting has been examined by Harvey, Liu and Zhu (2016) and Harvey and Liu (2015); Bailey and López de Prado (2014) formalised it as the Deflated Sharpe Ratio.
 
@@ -130,7 +120,7 @@ I had planned on four states, but the data does not support that choice:
 
 I select K = 3 on stability and episode adequacy.
 
-I initially read the BIC behaviour as a penalty that was simply too weak, and that was wrong. BIC that keeps falling across an entire grid is a recognised symptom of **emission misspecification**. When a Gaussian emission cannot represent the conditional distribution, extra states get recruited to approximate a non-Gaussian shape, and the likelihood gain keeps outrunning the penalty. Given the fat tails documented in Section 7, this is the likely mechanism. It means information criteria cannot identify the number of states under this emission family, and a *t*-distributed or mixture emission would be the natural next step. I did not pursue that here, and it is listed among the limitations in Section 9.
+It is tempting to read this as a penalty that is simply too weak. But BIC that keeps falling across an entire grid is a recognised symptom of **emission misspecification**. When a Gaussian emission cannot represent the conditional distribution, extra states get recruited to approximate a non-Gaussian shape, and the likelihood gain keeps outrunning the penalty. Given the fat tails documented in Section 7, this is the likely mechanism. It means information criteria cannot identify the number of states under this emission family, and a *t*-distributed or mixture emission would be the natural next step. I did not pursue that here, and it is listed among the limitations in Section 9.
 
 ### 3.6 Backtest protocol
 
@@ -155,13 +145,13 @@ December 1981 – August 2026 (535 months, 44.6 years), on equities, bonds and c
 | Rule: growth × inflation | 8.83% | 9.79% | 0.546 | −40.97% | 0.804 | −0.136 | [−0.377, +0.110] | 0.298 |
 | Equal weight | 7.78% | 7.94% | 0.529 | −32.62% | 0.866 | −0.153 | [−0.346, +0.040] | 0.121 |
 
-*Note: confidence intervals and p-values come from the same stationary-bootstrap distribution (5000 iterations, 12-month mean block length). The p-value is computed as 2·min(P(Δ* ≤ 0), P(Δ* ≥ 0)) over the bootstrap replicates, so an interval excluding zero and p < 0.05 are equivalent by construction. An earlier draft computed the interval by percentiles but took the p-value from a separately mean-centred distribution, which produced cells whose interval excluded zero alongside p > 0.05. That inconsistency has been removed.*
+*Note: confidence intervals and p-values come from the same stationary-bootstrap distribution (5000 iterations, 12-month mean block length). The p-value is computed as 2·min(P(Δ* ≤ 0), P(Δ* ≥ 0)) over the bootstrap replicates, so an interval excluding zero and p < 0.05 are equivalent by construction.*
 
 No strategy differs significantly from the benchmark, and every macro model ranks below it. The HMM does have a materially smaller maximum drawdown (−23.3% vs −28.5%), which suggests it mainly works by cutting risk heading into contractions. Its risk-adjusted return is no better, so drawdown is the one measure on which it plausibly justifies its complexity.
 
 ### 4.2 Specification sensitivity
 
-This result was originally a side note. I have moved it up because it illustrates the paper's thesis more directly than anything else in the study. All rows use the **business-cycle rule model** against the rebalanced 60/40 benchmark; only the sample start and asset set vary.
+This result illustrates the paper's thesis more directly than anything else in the study. All rows use the **business-cycle rule model** against the rebalanced 60/40 benchmark; only the sample start and asset set vary.
 
 | Sample start | Asset set | Years | Business-cycle rule | 60/40 | Δ | p |
 |---|---|---|---|---|---|---|
@@ -181,11 +171,11 @@ If anything this makes the illustration stronger. Including gold in a regime stu
 
 ### 4.3 The momentum benchmark
 
-I included a price-only momentum signal to test whether macroeconomic data adds anything beyond what prices already reflect. On raw-return ratios this benchmark ranked highest, and an earlier draft took that as evidence that markets price regimes before the data confirms them.
+I included a price-only momentum signal to test whether macroeconomic data adds anything beyond what prices already reflect. If markets price regimes before the data confirms them, a signal built only from prices should beat the macro models by a detectable margin.
 
-On excess returns that interpretation does not hold up. Momentum returns a Sharpe of 0.679 against the benchmark's 0.682, a difference of −0.003 with p = 0.999. On the longer three-asset sample beginning in 1970 (667 months) it ranks slightly above 60/40, by +0.102, again insignificantly. That figure happens to have the same magnitude as ablation cell A in Section 5 (−0.102), but the two are unrelated.
+Momentum returns a Sharpe of 0.679 against the benchmark's 0.682, a difference of −0.003 with p = 0.999. On the longer three-asset sample beginning in 1970 (667 months) it ranks slightly above 60/40, by +0.102, again insignificantly. That figure happens to have the same magnitude as ablation cell A in Section 5 (−0.102), but the two are unrelated.
 
-What can be defended is narrower than my original claim. A signal that uses no macroeconomic data performs about the same as both the benchmark and the macro models. That fits the idea that markets move before macro data arrives, but it fits equally well with none of these signals carrying enough information to detect, and this data cannot tell the two apart.
+What the data supports is a narrow statement. A signal that uses no macroeconomic data performs about the same as both the benchmark and the macro models. That fits the idea that markets move before macro data arrives, but it fits equally well with none of these signals carrying enough information to detect, and this data cannot tell the two apart.
 
 ### 4.4 Recession classification and conditional correlations
 
@@ -253,7 +243,7 @@ In-sample optimisation on its own raised the Sharpe from 0.655 to 0.688. That is
 
 ## 7. Statistical power
 
-There are two ways to read the nulls above. Either the effects really are small, or the study is unable to see them. This section shows that the second reading holds, and derives the result in closed form so that readers can apply it to their own parameters.
+There are two ways to read the nulls above. Either the effects really are small, or the study is unable to see them. This section shows that the second reading holds, and gives the result in closed form so that readers can apply it to their own parameters.
 
 ### 7.1 Closed form
 
@@ -265,20 +255,18 @@ For a two-sided test at level α and power 1 − β, the sample size required to
 
 > **T = [ 2 − 2ρ + ½(S₁² + S₂² − 2·S₁·S₂·ρ²) ] · [ (z₁₋α/₂ + z₁₋β) / δ ]²**
 
-Because three of my own errors came from applying a scale factor in the wrong power, I state the unit convention once here and enforce it in code:
+A scale factor applied in the wrong power is an easy error to make in this calculation and a hard one to spot on reading, so I state the unit convention once here and enforce it in code:
 
 1. All algebra is in **per-period variance** units.
 2. Annualisation happens **once**, at the boundary: *S*ₐₙₙ = *S*·√12, δₐₙₙ = δ·√12. Comparing a per-period variance to an annualised standard error understates the latter by 3.46.
 3. Inflation factors are supplied as ratios of **standard errors** (the observable quantity) and **squared** wherever a variance is required.
 4. Required sample size scales with **variance**, and therefore carries the square. Applying a standard-error ratio linearly understates the requirement by the ratio itself.
 
-Points 2 and 4 both fix mistakes made in earlier drafts.
-
-Two features of the formula matter for everything that follows. Required sample scales with **1/δ²**, so halving the effect quadruples the data needed. The leading term is **2(1 − ρ)**, so a high correlation between strategy and benchmark sharply reduces the variance of the difference; moving from ρ = 0.85 to ρ = 0.95 cuts the required sample by a factor of three. For that reason ρ should always be reported (Section 1.1 describes what leaving it out did to an earlier draft).
+Two features of the formula matter for everything that follows. Required sample scales with **1/δ²**, so halving the effect quadruples the data needed. The leading term is **2(1 − ρ)**, so a high correlation between strategy and benchmark sharply reduces the variance of the difference; moving from ρ = 0.85 to ρ = 0.95 cuts the required sample by a factor of three. For that reason ρ should always be reported.
 
 ### 7.2 Pinned reconciliation
 
-One of the earlier errors came from comparing standard errors computed under different parameterisations. To avoid that, every quantity below is evaluated at the **same** *T* = 535, the same benchmark Sharpe *S*₂ = 0.682, and each comparison's **own measured ρ**.
+Standard errors computed under different parameterisations cannot be meaningfully compared, so every quantity below is evaluated at the **same** *T* = 535, the same benchmark Sharpe *S*₂ = 0.682, and each comparison's **own measured ρ**.
 
 | Comparison | ρ | *S*₁ | Bootstrap SE | Memmel SE | Ratio |
 |---|---|---|---|---|---|
@@ -294,7 +282,7 @@ The ratio reflects both non-normality and serial dependence. The realised series
 
 The factor also varies across comparisons, from 1.15 to 1.34 with no obvious relation to ρ; squared, that becomes 1.32 to 1.80. Using a single factor hides a 36% spread in required sample, so the Section 7.3 figures, which use the median, are approximate.
 
-The Monte Carlo simulation does not count as a third, independent method. Simulating Gaussian returns at each comparison's own ρ reproduces the closed-form standard error to within 0.2–1.0%, as it has to, because both describe the same i.i.d. normal model. The simulation checks the algebra and tells us nothing further about the empirical result. An earlier draft described "three independent methods agreeing" when two of them were really the same method, and the third differed from them by the tail inflation above, evaluated at a mismatched ρ.
+The Monte Carlo simulation does not count as a third, independent method. Simulating Gaussian returns at each comparison's own ρ reproduces the closed-form standard error to within 0.2–1.0%, as it has to, because both describe the same i.i.d. normal model. The simulation checks the algebra and tells us nothing further about the empirical result.
 
 That leaves two routes: an **analytic** one (the closed form, confirmed by simulation) and an **empirical** one (the stationary bootstrap), with the empirical standard errors 15–34% larger in every comparison.
 
@@ -329,7 +317,7 @@ Minimum detectable effects range from **0.18 to 0.36 Sharpe**, and power against
 
 The momentum row needs a caveat. Power of 5% against an observed effect of 0.003 is really just the size of the test, because power against a null effect equals α by construction. The row means this comparison observed nothing; it does not mean the comparison had low power to find something. The informative rows are the ones with sizeable observed effects and still inadequate power: equal weight (0.153 observed, 34% power) and the growth × inflation rule (0.136 observed, 19% power).
 
-An earlier draft also mixed up two thresholds. The half-width of a 95% confidence interval is the effect that would be *just* significant, which corresponds to **50%** power, an even chance of detection. The conventional 80% threshold requires (z₀.₉₇₅ + z₀.₈₀) = 2.80 standard errors instead of 1.96. Calling a CI half-width "the minimum detectable effect" understates the requirement by a factor of 1.43, which is why the table shows both columns.
+Two thresholds are easy to confuse here. The half-width of a 95% confidence interval is the effect that would be *just* significant, which corresponds to **50%** power, an even chance of detection. The conventional 80% threshold requires (z₀.₉₇₅ + z₀.₈₀) = 2.80 standard errors instead of 1.96. Calling a CI half-width "the minimum detectable effect" understates the requirement by a factor of 1.43, which is why the table shows both columns.
 
 ## 8. Implications
 
@@ -387,7 +375,7 @@ The power analysis assumes the true effect is stable over time. If the benefit o
 
 The closed form assumes i.i.d. returns. I correct for this empirically with a standard-error ratio of 1.248 (variance 1.558) measured at pinned parameters in Section 7.2, but I do not model the dependence structure analytically. Because that ratio mixes non-normality with serial dependence and varies across comparisons (1.15–1.34), the Section 7.3 figures are approximate. Ledoit and Wolf (2008) offer a more rigorous approach.
 
-The power argument itself is not new. Harvey and Liu (2015), Harvey, Liu and Zhu (2016), and Bailey and López de Prado (2014) make closely related points. What this paper adds is an explicit sample-length formula, its validation, and its application to a complete, reproducible pipeline, including my own results.
+Neither the power argument nor the sample-length expression is new. Harvey and Liu (2015), Harvey, Liu and Zhu (2016), and Bailey and López de Prado (2014) make closely related points about backtest inference, and Opdyke (2007) and Bailey and López de Prado (2012) give closely related minimum-sample results. What this paper adds is the application of the expression across realistic values of ρ, the per-comparison detectability table, and a complete, reproducible pipeline to which both are applied, including my own results.
 
 ---
 
@@ -403,19 +391,19 @@ Large effects can still be tested, though not in every case. A strategy promisin
 
 ---
 
-## Disclosure of methods and tooling
+## Declaration of generative AI and AI-assisted technologies
 
-This paper and its pipeline were developed with the help of an AI coding assistant (Anthropic Claude), which I used for implementation, drafting and iterative review. I directed the research questions, made the methodological decisions, and am responsible for all claims.
+During this project I used Anthropic's Claude, through the Claude Code tool, to write and debug code, draft and edit text, and review calculations. I set the research questions, made the methodological decisions, and checked the results, and I take full responsibility for the content of the paper.
 
-I make the disclosure for two reasons beyond convention. Several substantive turns in the project came out of that iterative process, including the discovery that the usual credit-spread series is no longer available in usable form, the finding that information criteria do not identify a state count here, and each of the unit errors documented in Section 1.1. The paper's argument about verification is tied up with how the paper was written.
-
-The second reason matters more. This paper argues that trust in a quantitative result should come from mechanical reproducibility, whoever or whatever produced it, and that applies at least as strongly when part of the work was done by a machine. Every figure reported here is regenerated from the committed data by the commands in Appendix A, and `tests/test_units_and_tables.py` rebuilds each published table cell from its primitives and fails if the manuscript and the code disagree. Readers are encouraged to check the numbers for themselves.
+I did not rely on the tool's output being correct. Every figure in the paper is generated by code in the public repository and can be regenerated from the committed data with the commands in Appendix A. The test suite in `tests/test_units_and_tables.py` recomputes each published table value from its inputs and fails if the paper and the code disagree, so an error in the reported numbers shows up as a failing test whoever introduced it. Readers can run the suite and check the results for themselves.
 
 ---
 
 ## References
 
 Ang, A., & Bekaert, G. (2002). International asset allocation with regime shifts. *Review of Financial Studies*, 15(4), 1137–1187.
+
+Bailey, D. H., & López de Prado, M. (2012). The Sharpe ratio efficient frontier. *Journal of Risk*, 15(2), 3–44.
 
 Bailey, D. H., & López de Prado, M. (2014). The deflated Sharpe ratio: Correcting for selection bias, backtest overfitting, and non-normality. *Journal of Portfolio Management*, 40(5), 94–107.
 
@@ -439,6 +427,8 @@ Memmel, C. (2003). Performance hypothesis testing with the Sharpe ratio. *Financ
 
 Newey, W. K., & West, K. D. (1987). A simple, positive semi-definite, heteroskedasticity and autocorrelation consistent covariance matrix. *Econometrica*, 55(3), 703–708.
 
+Opdyke, J. D. (2007). Comparing Sharpe ratios: So where are the p-values? *Journal of Asset Management*, 8(5), 308–336.
+
 Politis, D. N., & Romano, J. P. (1994). The stationary bootstrap. *Journal of the American Statistical Association*, 89(428), 1303–1313.
 
 Welch, I., & Goyal, A. (2008). A comprehensive look at the empirical performance of equity premium prediction. *Review of Financial Studies*, 21(4), 1455–1508.
@@ -447,7 +437,7 @@ Welch, I., & Goyal, A. (2008). A comprehensive look at the empirical performance
 
 ## Appendix A: Reproducibility
 
-All results are generated from a committed data cache and require no API credentials. The code, data and test suite are archived on Zenodo (DOI 10.5281/zenodo.22737848, release v1.0-preprint), so every figure can be reproduced from a fixed snapshot rather than a moving branch. That archive was made from Revision 5 of this manuscript. This revision differs from it only in voice and wording and in the addition of this DOI; no figure, table or result has changed. The results are reproduced with:
+All results are generated from a committed data cache and require no API credentials. The code, data and test suite are archived on Zenodo (DOI 10.5281/zenodo.22737848, release v1.0-preprint), so every figure can be reproduced from a fixed snapshot rather than a moving branch. That archive was made from an earlier version of this manuscript, which differs from this one in wording, in its coverage of the literature, and in a revision log that has since been removed. No figure, table or result has changed. The results are reproduced with:
 
 ```bash
 python -m macroregime.run                # pipeline and primary results
@@ -465,7 +455,7 @@ The look-ahead tests check the property directly. The main test is adversarial: 
 
 ### A.2 Unit and table-regression tests
 
-Each error found in review was a scale factor applied in the wrong power, and each could have been caught by recomputing a published number from its own primitives. `tests/test_units_and_tables.py` does that recomputation automatically. It checks that required sample size scales with the *square* of a standard-error ratio and the inverse square of the effect, that annualisation is applied exactly once, and that power against a null effect equals α. It also rebuilds all thirty cells of the Section 7.3 table from the closed form and fails if the paper and the code diverge.
+Errors of scale, such as a factor applied in the wrong power, are easy to miss on reading but show up immediately when a published number is recomputed from its primitives. `tests/test_units_and_tables.py` does that recomputation automatically. It checks that required sample size scales with the *square* of a standard-error ratio and the inverse square of the effect, that annualisation is applied exactly once, and that power against a null effect equals α. It also rebuilds all thirty cells of the Section 7.3 table from the closed form and fails if the paper and the code diverge.
 
 ### A.3 Generated artefacts
 
