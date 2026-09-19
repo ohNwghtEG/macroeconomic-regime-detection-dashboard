@@ -1,6 +1,6 @@
 """Render PAPER.md to PAPER.pdf for SSRN / arXiv submission.
 
-    python scripts/build_paper_pdf.py
+    python scripts/build_paper_pdf.py [SOURCE.md [TARGET.pdf]]
 
 The PDF is a build artifact of the manuscript, generated rather than hand-edited,
 so it can never drift from PAPER.md - the same discipline the test suite applies
@@ -9,6 +9,11 @@ to the paper's figures.
 Before rendering, every non-ASCII character in the manuscript is checked against
 the embedded font. A missing glyph renders as a solid box, silently; this script
 fails loudly instead.
+
+Display equations (```latex blocks) are typeset with matplotlib's mathtext and
+figures (``![caption](path)``, path relative to the repository root) are placed
+at text width. Times New Roman / Consolas are used on Windows; elsewhere the
+Times-like FreeSerif and Liberation Mono are used instead.
 """
 
 from __future__ import annotations
@@ -28,6 +33,7 @@ from reportlab.pdfbase.pdfmetrics import stringWidth
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import (
     HRFlowable,
+    Image,
     KeepTogether,
     Paragraph,
     Preformatted,
@@ -41,6 +47,8 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "PAPER.md"
 TARGET = ROOT / "PAPER.pdf"
 FONT_DIR = Path("C:/Windows/Fonts")
+FALLBACK_DIR = Path("/usr/share/fonts/truetype")
+EQUATION_DIR = ROOT / "reports" / "_equations"
 
 SERIF, MONO = "PaperSerif", "PaperMono"
 
@@ -58,10 +66,22 @@ def register_fonts() -> TTFont:
         MONO: "consola.ttf",
         f"{MONO}-Bold": "consolab.ttf",
     }
+    # FreeSerif rather than Liberation Serif: both are Times-like, but only
+    # FreeSerif carries every glyph the manuscript uses (e.g. U+207B in 10⁻¹⁴)
+    fallback = {
+        "times.ttf": "freefont/FreeSerif.ttf",
+        "timesbd.ttf": "freefont/FreeSerifBold.ttf",
+        "timesi.ttf": "freefont/FreeSerifItalic.ttf",
+        "timesbi.ttf": "freefont/FreeSerifBoldItalic.ttf",
+        "consola.ttf": "liberation/LiberationMono-Regular.ttf",
+        "consolab.ttf": "liberation/LiberationMono-Bold.ttf",
+    }
     for name, file in faces.items():
         path = FONT_DIR / file
         if not path.exists():
-            sys.exit(f"missing font file: {path}")
+            path = FALLBACK_DIR / fallback[file]
+        if not path.exists():
+            sys.exit(f"missing font file: {FONT_DIR / file} (and no fallback {path})")
         pdfmetrics.registerFont(TTFont(name, str(path)))
 
     pdfmetrics.registerFontFamily(
@@ -252,6 +272,54 @@ def build_table(rows: list[list[str]], st: dict, width: float) -> Table:
     return t
 
 
+def equation(tex: str, index: int, width: float) -> Image:
+    """Typeset one display equation with matplotlib mathtext, as a centred image.
+
+    mathtext lacks a few LaTeX macros; they are mapped to equivalents that render
+    identically rather than being rewritten in the manuscript.
+    """
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    expr = tex.strip()
+    for a, b in ((r"\operatorname", r"\mathrm"), (r"\tfrac", r"\frac"),
+                 (r"\text", r"\mathrm")):
+        expr = expr.replace(a, b)
+    # \mathrm{release date}: mathtext drops spaces inside \mathrm
+    expr = re.sub(r"\\mathrm\{([^}]*)\}",
+                  lambda m: r"\mathrm{" + m.group(1).replace(" ", r"\ ") + "}", expr)
+
+    EQUATION_DIR.mkdir(parents=True, exist_ok=True)
+    out = EQUATION_DIR / f"eq{index}.png"
+    matplotlib.rcParams["mathtext.fontset"] = "stix"
+    fig = plt.figure(figsize=(0.01, 0.01))
+    fig.text(0, 0, f"${expr}$", fontsize=11)
+    fig.savefig(out, dpi=300, bbox_inches="tight", pad_inches=0.04, transparent=True)
+    plt.close(fig)
+
+    img = Image(str(out))
+    w, h = img.imageWidth * 72 / 300, img.imageHeight * 72 / 300
+    scale = min(1.0, width / w)
+    img.drawWidth, img.drawHeight = w * scale, h * scale
+    img.hAlign = "CENTER"
+    return img
+
+
+def figure(path: str, width: float) -> Image:
+    """A figure at text width (or its natural width, if narrower)."""
+    src = (ROOT / path) if not Path(path).is_absolute() else Path(path)
+    if not src.exists():
+        sys.exit(f"figure not found: {src}")
+    img = Image(str(src))
+    w, h = img.imageWidth, img.imageHeight
+    draw_w = min(width, w * 72 / 200)          # figures are saved at 200 dpi
+    img.drawWidth, img.drawHeight = draw_w, draw_w * h / w
+    img.hAlign = "CENTER"
+    return img
+
+
 def parse(markdown: str, st: dict, width: float) -> list:
     lines = markdown.splitlines()
     story: list = []
@@ -275,6 +343,27 @@ def parse(markdown: str, st: dict, width: float) -> list:
         line = lines[i]
         stripped = line.strip()
 
+        if stripped.startswith("```latex"):
+            flush()
+            block = []
+            i += 1
+            while i < len(lines) and not lines[i].strip().startswith("```"):
+                block.append(lines[i])
+                i += 1
+            story.append(Spacer(1, 2))
+            story.append(equation("\n".join(block), len(story), width))
+            story.append(Spacer(1, 6))
+            i += 1
+            continue
+
+        if m := re.fullmatch(r"!\[[^\]]*\]\(([^)]+)\)", stripped):
+            flush()
+            story.append(Spacer(1, 4))
+            story.append(figure(m.group(1), width))
+            story.append(Spacer(1, 4))
+            i += 1
+            continue
+
         if stripped.startswith("```"):
             flush()
             block = []
@@ -282,7 +371,16 @@ def parse(markdown: str, st: dict, width: float) -> list:
             while i < len(lines) and not lines[i].strip().startswith("```"):
                 block.append(lines[i])
                 i += 1
-            story.append(Preformatted("\n".join(block), st["code"]))
+            # shrink a code block whose longest line would overrun the text width
+            code_style = st["code"]
+            avail = width - code_style.leftIndent - 4
+            longest = max((stringWidth(b, MONO, code_style.fontSize) for b in block),
+                          default=0)
+            if longest > avail:
+                size = code_style.fontSize * avail / longest
+                code_style = ParagraphStyle("code_fit", parent=code_style,
+                                            fontSize=size, leading=size * 1.27)
+            story.append(Preformatted("\n".join(block), code_style))
             i += 1
             continue
 
@@ -371,17 +469,20 @@ def footer(canvas, doc) -> None:
 
 
 def main() -> None:
-    text = SOURCE.read_text(encoding="utf-8")
+    source = Path(sys.argv[1]) if len(sys.argv) > 1 else SOURCE
+    target = Path(sys.argv[2]) if len(sys.argv) > 2 else TARGET
+    text = source.read_text(encoding="utf-8")
+    title = next((ln[2:].strip() for ln in text.splitlines() if ln.startswith("# ")),
+                 "Underpowered by Construction")
     font = register_fonts()
     audit_glyphs(text, font)
 
     margin = 0.95 * inch
     doc = SimpleDocTemplate(
-        str(TARGET), pagesize=letter,
+        str(target), pagesize=letter,
         leftMargin=margin, rightMargin=margin,
         topMargin=0.85 * inch, bottomMargin=0.9 * inch,
-        title="Underpowered by Construction: Sharpe Differences of 0.1 Are Not "
-              "Estimable from Realistic Samples",
+        title=title,
         author="Ethan Gao",
         subject="Statistical power of backtest comparisons; macroeconomic regime models",
         keywords="regime switching, hidden Markov models, backtesting, statistical "
@@ -390,7 +491,7 @@ def main() -> None:
     )
     story = parse(text, styles(), letter[0] - 2 * margin)
     doc.build(story, onFirstPage=footer, onLaterPages=footer)
-    print(f"wrote {TARGET} ({TARGET.stat().st_size / 1024:.0f} KB)")
+    print(f"wrote {target} ({target.stat().st_size / 1024:.0f} KB)")
 
 
 if __name__ == "__main__":

@@ -17,6 +17,7 @@ data/raw/
 
 # Generated reports (the built HTML report IS committed; intermediates are not)
 reports/_intermediate/
+reports/_equations/
 .ipynb_checkpoints/
 
 # Journal submissions - must not be posted publicly while under review

@@ -1,0 +1,8 @@
+{
+  "common_index_months": 536,
+  "common_index_start": "1981-12-31",
+  "common_index_end": "2026-08-31",
+  "backtest_months": 535,
+  "backtest_start": "1982-01-31",
+  "backtest_end": "2026-08-31"
+}
