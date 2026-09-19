@@ -6,8 +6,6 @@ I built a systematic macro regime model to see whether it beats a static 60/40. 
 
 Over 44.6 years of point-in-time data, the walk-forward hidden Markov model returns an excess-return Sharpe of **0.655** against a rebalanced 60/40's **0.682** (p = 0.64), and nothing else beats the benchmark either. The more useful part is why that null tells you so little. The study had between **5% and 34% power** against the effects it observed, and detecting a 0.1 Sharpe improvement would take between **128 and 610 years** of monthly data, depending on the correlation between strategy and benchmark.
 
-The full write-up is in **[PAPER.md](PAPER.md)** (PDF: [PAPER.pdf](PAPER.pdf)). This README gives an overview.
-
 ---
 
 ## The finding, in one table
