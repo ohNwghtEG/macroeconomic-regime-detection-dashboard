@@ -1,4 +1,4 @@
-"""Paper Figures 1 and 2, generated from the committed report CSVs.
+"""Figures 1 and 2 (sample size by correlation; detectability), from the report CSVs.
 
     python scripts/make_figures.py
 

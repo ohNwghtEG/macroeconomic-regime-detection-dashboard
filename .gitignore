@@ -23,6 +23,13 @@ reports/_equations/
 # Journal submissions - must not be posted publicly while under review
 journal/
 
+# The manuscript is kept out of the repository (code only)
+PAPER*
+*.docx
+Underpowered*.pdf
+docs/revisions/
+scripts/build_paper_pdf.py
+
 # OS
 .DS_Store
 Thumbs.db

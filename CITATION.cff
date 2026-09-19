@@ -1,8 +1,6 @@
 cff-version: 1.2.0
-title: >-
-  Underpowered by Construction: Sharpe Differences of 0.1 Are Not
-  Estimable from Realistic Samples
-message: If you use this software or paper, please cite it as below.
+title: Macroeconomic Regime Detection
+message: If you use this software, please cite it as below.
 type: software
 authors:
   - given-names: Ethan
@@ -17,18 +15,15 @@ identifiers:
     value: 10.5281/zenodo.22737848
     description: Version DOI for release v1.0-preprint
 abstract: >-
-  A macroeconomic regime-detection and asset-allocation pipeline built to
-  institutional real-time standards - point-in-time data honouring each series'
-  publication lag, forward-filtered hidden-Markov state probabilities, and
-  expanding-window re-estimation - used to ask not whether regime models beat a
-  static 60/40 but whether a backtest of realistic length could detect it if
-  they did. Over 535 months no regime allocation differs significantly from a
-  rebalanced 60/40, and a factorial ablation reintroducing three forms of
-  look-ahead bias produces nothing surviving multiple-testing correction. A
-  closed-form sample-size expression, derived from the Jobson-Korkie statistic
-  with the Memmel correction and validated against simulation, shows why:
-  detecting a 0.10 Sharpe difference requires between 128 and 610 years of
-  monthly data depending on the correlation between strategy and benchmark.
+  A macroeconomic regime-detection and asset-allocation pipeline built to real-time
+  standards: point-in-time data aligned to each series' publication lag,
+  forward-filtered hidden Markov state probabilities, and expanding-window
+  re-estimation, with tests that check the absence of look-ahead directly. It
+  compares regime strategies with a rebalanced 60/40 portfolio over 535 months,
+  runs a factorial ablation that restores three forms of look-ahead bias, and
+  measures statistical power: detecting a 0.1 Sharpe ratio improvement at 80%
+  power requires between 128 and 610 years of monthly data, depending on the
+  correlation between strategy and benchmark.
 keywords:
   - regime switching
   - hidden Markov models

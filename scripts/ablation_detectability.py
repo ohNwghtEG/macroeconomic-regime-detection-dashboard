@@ -1,4 +1,4 @@
-"""Ablation detectability: rho and 80% MDE for each look-ahead cell (paper Table 6).
+"""Ablation detectability: rho and 80% MDE for each look-ahead cell (Table 6).
 
     python scripts/ablation_detectability.py
 
